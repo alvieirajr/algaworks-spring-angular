@@ -94,7 +94,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
             .and()
                 .authorizeRequests()
                 .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()]))
