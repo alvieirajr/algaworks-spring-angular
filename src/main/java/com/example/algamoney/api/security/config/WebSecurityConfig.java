@@ -99,10 +99,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()]))
                 .permitAll()
-            .and()
+            .and()   
+             	.authorizeRequests()
+             	.antMatchers("/categorias").hasRole("ADMIN")
+             .and()
                 .authorizeRequests()
                 .antMatchers(API_ROOT_URL).authenticated() // Protected API End-points
-            .and()
+             .and()
                 .addFilterBefore(new CustomCorsFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildAjaxLoginProcessingFilter(AUTHENTICATION_URL), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(permitAllEndpointList,
