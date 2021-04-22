@@ -1,7 +1,9 @@
 package com.example.algamoney.api.resource;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -48,13 +50,19 @@ public class RefreshTokenEndpoint {
     @Autowired private JwtSettings jwtSettings;
     @Autowired private UsuarioService usuarioService;
     @Autowired private TokenVerifier tokenVerifier;
-    @Autowired @Qualifier("jwtHeaderTokenExtractor") private TokenExtractor tokenExtractor;
     
-    @RequestMapping(value="/api/auth/token", method=RequestMethod.GET, produces={ MediaType.APPLICATION_JSON_VALUE })
+    @RequestMapping(value="/api/auth/token", method=RequestMethod.POST, produces={ MediaType.APPLICATION_JSON_VALUE })
     public @ResponseBody JwtToken refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String tokenPayload = tokenExtractor.extract(request.getHeader(WebSecurityConfig.AUTHENTICATION_HEADER_NAME));
         
-        RawAccessJwtToken rawToken = new RawAccessJwtToken(tokenPayload);
+    	HttpServletRequest req = (HttpServletRequest) request;
+    	String refreshTokenOnCookie = null;
+    	for (Cookie cookie : req.getCookies()) {
+			if (cookie.getName().equals("refreshToken")) {
+				refreshTokenOnCookie = cookie.getValue();
+			}
+		}
+	
+        RawAccessJwtToken rawToken = new RawAccessJwtToken(refreshTokenOnCookie);
         RefreshToken refreshToken = RefreshToken.create(rawToken, jwtSettings.getTokenSigningKey()).orElseThrow(() -> new InvalidJwtToken());
 
         String jti = refreshToken.getJti();

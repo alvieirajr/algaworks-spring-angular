@@ -82,15 +82,12 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
     	UserContext userContext = (UserContext) authResult.getPrincipal();
         JwtToken refreshToken = tokenFactory.createRefreshToken(userContext);
 	  	
- 	Cookie cookie  = new Cookie("refreshToken", refreshToken.getToken());
+        Cookie cookie  = new Cookie("refreshToken", refreshToken.getToken());
 		cookie.setHttpOnly(true);
 		cookie.setSecure(false);
-		cookie.setPath(request.getContextPath() + WebSecurityConfig.AUTHENTICATION_URL);
+		cookie.setPath(request.getContextPath() + WebSecurityConfig.REFRESH_TOKEN_URL);
 		cookie.setMaxAge(259200);
 		response.addCookie(cookie);
-		response.setHeader("Access-Control-Allow-Origin", "true");
-		
-    	
     	
         successHandler.onAuthenticationSuccess(request, response, authResult);	
     }
