@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,6 +21,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.example.algamoney.api.security.auth.JwtAuthenticationToken;
 import com.example.algamoney.api.security.auth.jwt.extractor.TokenExtractor;
 import com.example.algamoney.api.security.config.WebSecurityConfig;
+import com.example.algamoney.api.security.model.UserContext;
+import com.example.algamoney.api.security.model.token.JwtToken;
+import com.example.algamoney.api.security.model.token.JwtTokenFactory;
 import com.example.algamoney.api.security.model.token.RawAccessJwtToken;
 
 /**
@@ -52,10 +56,10 @@ public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticati
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
+    	SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authResult);
         SecurityContextHolder.setContext(context);
-        chain.doFilter(request, response);
+        chain.doFilter(request, response);  
     }
 
     @Override

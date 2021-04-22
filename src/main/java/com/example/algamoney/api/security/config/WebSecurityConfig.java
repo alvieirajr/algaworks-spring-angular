@@ -24,6 +24,7 @@ import com.example.algamoney.api.security.auth.jwt.JwtAuthenticationProvider;
 import com.example.algamoney.api.security.auth.jwt.JwtTokenAuthenticationProcessingFilter;
 import com.example.algamoney.api.security.auth.jwt.SkipPathRequestMatcher;
 import com.example.algamoney.api.security.auth.jwt.extractor.TokenExtractor;
+import com.example.algamoney.api.security.model.token.JwtTokenFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -48,13 +49,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired private JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @Autowired private TokenExtractor tokenExtractor;
+    
+    @Autowired private JwtTokenFactory tokenFactory;
 
     @Autowired private AuthenticationManager authenticationManager;
 
     @Autowired private ObjectMapper objectMapper;
 
     protected AjaxLoginProcessingFilter buildAjaxLoginProcessingFilter(String loginEntryPoint) throws Exception {
-        AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter(loginEntryPoint, successHandler, failureHandler, objectMapper);
+        AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter(loginEntryPoint, successHandler, failureHandler, objectMapper, tokenFactory);
         filter.setAuthenticationManager(this.authenticationManager);
         return filter;
     }
