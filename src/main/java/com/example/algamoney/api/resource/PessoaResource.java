@@ -29,7 +29,7 @@ import com.example.algamoney.api.event.RecursoCriadoEvent;
 import com.example.algamoney.api.model.Pessoa;
 
 @RestController
-@RequestMapping("/pessoas")
+@RequestMapping("/api/pessoas")
 public class PessoaResource {
 	
 	@Autowired

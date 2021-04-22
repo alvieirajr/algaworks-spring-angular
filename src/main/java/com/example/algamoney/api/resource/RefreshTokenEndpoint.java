@@ -64,8 +64,8 @@ public class RefreshTokenEndpoint {
 		HttpServletRequest req = (HttpServletRequest) request;
 		String refreshTokenOnCookie = null;
 		if (req.getCookies() == null) {
+			req.setAttribute("breakFiltersChain", true);
 			throw new AuthenticationServiceException("Refresh token cookie not found!");
-
 		} else {
 			for (Cookie cookie : req.getCookies()) {
 				if (cookie.getName().equals("refreshToken")) {

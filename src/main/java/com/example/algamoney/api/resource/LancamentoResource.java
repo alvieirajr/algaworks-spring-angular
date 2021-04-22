@@ -33,7 +33,7 @@ import com.example.algamoney.api.services.LancamentoService;
 import com.example.algamoney.api.services.exception.PessoaInexistenteOuInativaException;
 
 @RestController
-@RequestMapping("/lancamentos")
+@RequestMapping("/api/lancamentos")
 public class LancamentoResource {
 	
 	@Autowired

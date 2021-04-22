@@ -36,32 +36,21 @@ import com.example.algamoney.api.security.model.token.RawAccessJwtToken;
  */
 public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
     private final AuthenticationFailureHandler failureHandler;
-    //private final TokenExtractor tokenExtractor;
+    private final TokenExtractor tokenExtractor;
     
     @Autowired
     public JwtTokenAuthenticationProcessingFilter(AuthenticationFailureHandler failureHandler, 
             TokenExtractor tokenExtractor, RequestMatcher matcher) {
         super(matcher);
         this.failureHandler = failureHandler;
+        this.tokenExtractor = tokenExtractor;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {        
-		HttpServletRequest req = (HttpServletRequest) request;
-		String refreshTokenOnCookie = null;
-		if (req.getCookies() == null) {
-			throw new AuthenticationServiceException("Refresh token cookie not found!");
-
-		} else {
-			for (Cookie cookie : req.getCookies()) {
-				if (cookie.getName().equals("refreshToken")) {
-					refreshTokenOnCookie = cookie.getValue();
-				}
-			}
-		}   	
-    	
-    	RawAccessJwtToken token = new RawAccessJwtToken(refreshTokenOnCookie);
+    	String tokenPayload = request.getHeader(WebSecurityConfig.AUTHENTICATION_HEADER_NAME);
+        RawAccessJwtToken token = new RawAccessJwtToken(tokenExtractor.extract(tokenPayload));
         return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
         
     }

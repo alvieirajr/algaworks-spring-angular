@@ -40,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String AUTHENTICATION_HEADER_NAME = "Authorization";
     public static final String AUTHENTICATION_URL = "/api/auth/login";
     public static final String REFRESH_TOKEN_URL = "/api/auth/token";
-    public static final String API_ROOT_URL = "/**";
+    public static final String API_ROOT_URL = "/api/**";
 
     @Autowired private RestAuthenticationEntryPoint authenticationEntryPoint;
     @Autowired private AuthenticationSuccessHandler successHandler;
@@ -88,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             AUTHENTICATION_URL,
             REFRESH_TOKEN_URL
         );
-
+        
         http
             .csrf().disable() // We don't need CSRF for JWT based authentication
             .exceptionHandling()
@@ -99,15 +99,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()]))
-                .permitAll()
-            .and()   
-             	.authorizeRequests()
+                .antMatchers(REFRESH_TOKEN_URL).permitAll()
+                .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()])).permitAll()
              	.antMatchers("/categorias").hasRole("ADMIN")
-             .and()
-                .authorizeRequests()
-                .antMatchers(API_ROOT_URL).authenticated() // Protected API End-points
-             .and()
+                .antMatchers(AUTHENTICATION_URL).authenticated() // Protected API End-points
+                .and()
                 .addFilterBefore(new CustomCorsFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildAjaxLoginProcessingFilter(AUTHENTICATION_URL), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(permitAllEndpointList,
