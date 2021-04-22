@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,45 +43,59 @@ import com.example.algamoney.api.security.model.token.RefreshToken;
  * 
  * @author vladimir.stankovic
  *
- * Aug 17, 2016
+ *         Aug 17, 2016
  */
 @RestController
 public class RefreshTokenEndpoint {
-    @Autowired private JwtTokenFactory tokenFactory;
-    @Autowired private JwtSettings jwtSettings;
-    @Autowired private UsuarioService usuarioService;
-    @Autowired private TokenVerifier tokenVerifier;
-    
-    @RequestMapping(value="/api/auth/token", method=RequestMethod.POST, produces={ MediaType.APPLICATION_JSON_VALUE })
-    public @ResponseBody JwtToken refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        
-    	HttpServletRequest req = (HttpServletRequest) request;
-    	String refreshTokenOnCookie = null;
-    	for (Cookie cookie : req.getCookies()) {
-			if (cookie.getName().equals("refreshToken")) {
-				refreshTokenOnCookie = cookie.getValue();
+	@Autowired
+	private JwtTokenFactory tokenFactory;
+	@Autowired
+	private JwtSettings jwtSettings;
+	@Autowired
+	private UsuarioService usuarioService;
+	@Autowired
+	private TokenVerifier tokenVerifier;
+
+	@RequestMapping(value = "/api/auth/token", method = RequestMethod.POST, produces = {
+			MediaType.APPLICATION_JSON_VALUE })
+	public @ResponseBody JwtToken refreshToken(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+
+		HttpServletRequest req = (HttpServletRequest) request;
+		String refreshTokenOnCookie = null;
+		if (req.getCookies() == null) {
+			throw new AuthenticationServiceException("Refresh token cookie not found!");
+
+		} else {
+			for (Cookie cookie : req.getCookies()) {
+				if (cookie.getName().equals("refreshToken")) {
+					refreshTokenOnCookie = cookie.getValue();
+				}
 			}
 		}
-	
-        RawAccessJwtToken rawToken = new RawAccessJwtToken(refreshTokenOnCookie);
-        RefreshToken refreshToken = RefreshToken.create(rawToken, jwtSettings.getTokenSigningKey()).orElseThrow(() -> new InvalidJwtToken());
 
-        String jti = refreshToken.getJti();
-        if (!tokenVerifier.verify(jti)) {
-            throw new InvalidJwtToken();
-        }
+		RawAccessJwtToken rawToken = new RawAccessJwtToken(refreshTokenOnCookie);
+		RefreshToken refreshToken = RefreshToken.create(rawToken, jwtSettings.getTokenSigningKey())
+				.orElseThrow(() -> new InvalidJwtToken());
 
-        String subject = refreshToken.getSubject();
-        Usuario user = usuarioService.getByUsername(subject).orElseThrow(() -> new UsernameNotFoundException("User not found: " + subject));
+		String jti = refreshToken.getJti();
+		if (!tokenVerifier.verify(jti)) {
+			throw new InvalidJwtToken();
+		}
 
-        if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getRole().authority()))
-                .collect(Collectors.toList());
+		String subject = refreshToken.getSubject();
+		Usuario user = usuarioService.getByUsername(subject)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found: " + subject));
 
-        UserContext userContext = UserContext.create(user.getUsername(), authorities);
+		if (user.getRoles() == null)
+			throw new InsufficientAuthenticationException("User has no roles assigned");
+		List<GrantedAuthority> authorities = user.getRoles().stream()
+				.map(authority -> new SimpleGrantedAuthority(authority.getRole().authority()))
+				.collect(Collectors.toList());
 
-        return tokenFactory.createAccessJwtToken(userContext);
-    }
+		UserContext userContext = UserContext.create(user.getUsername(), authorities);
+
+		return tokenFactory.createAccessJwtToken(userContext);
+	}
 
 }
