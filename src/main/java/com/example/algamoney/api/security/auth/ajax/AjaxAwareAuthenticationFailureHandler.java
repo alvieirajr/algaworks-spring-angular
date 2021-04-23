@@ -45,24 +45,26 @@ public class AjaxAwareAuthenticationFailureHandler implements AuthenticationFail
 		
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		
+		String detail = e.getCause() != null ? e.getCause().toString() : e.toString();
+		
 		if (e instanceof BadCredentialsException) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), detail, e.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
 		} else if (e instanceof JwtExpiredTokenException) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			mapper.writeValue(response.getWriter(), ErrorResponse.of("Token has expired", ErrorCode.JWT_TOKEN_EXPIRED, HttpStatus.UNAUTHORIZED));
+			mapper.writeValue(response.getWriter(), ErrorResponse.of("Token has expired", detail, e.getClass().getName(), ErrorCode.JWT_TOKEN_EXPIRED, HttpStatus.UNAUTHORIZED));
 		} else if (e instanceof AuthMethodNotSupportedException) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-		    mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+		    mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), detail, e.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
 		} else if (e instanceof UsernameNotFoundException) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-		    mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));			
+		    mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), detail, e.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));			
 		} else if (e instanceof AuthenticationServiceException) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));		
+			mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), detail, e.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));		
 		} else {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			mapper.writeValue(response.getWriter(), ErrorResponse.of("Authentication failed", ErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
+			mapper.writeValue(response.getWriter(), ErrorResponse.of("Authentication failed", detail, e.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
 		}
 	}
 }

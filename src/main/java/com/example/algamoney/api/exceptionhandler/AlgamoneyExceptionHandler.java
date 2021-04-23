@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.example.algamoney.api.common.ErrorCode;
+import com.example.algamoney.api.common.ErrorResponse;
 import com.example.algamoney.api.security.exceptions.MissingRefreshTokenCookieException;
 
 @ControllerAdvice
@@ -33,11 +35,9 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		// TODO Auto-generated method stub
-
-		String mensagem = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
-		String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(mensagem, mensagemDesenvolvedor));
+		String message = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
+		String detail = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.GLOBAL, HttpStatus.BAD_REQUEST));
 
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 
@@ -47,28 +47,29 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		// TODO Auto-generated method stub
-		List<Erro> erros = criarListaErro(ex.getBindingResult());
+		List<ErrorResponse> erros = criarListaErro(ex.getBindingResult());
 		return handleExceptionInternal(ex, erros, headers, status, request);
 	}
 	
-	private List<Erro> criarListaErro(BindingResult bindingResult) {
-		List<Erro> erros = new ArrayList();
+	private List<ErrorResponse> criarListaErro(BindingResult bindingResult) {
+		List<ErrorResponse> errors = new ArrayList();
 
 		for (FieldError fieldError : bindingResult.getFieldErrors()) {
-			String mensagemUsuario = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
-			String mensagemDesenvolvedor = fieldError.toString();
+			String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+			String detail = fieldError.toString();
 
-			erros.add(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+			errors.add(ErrorResponse.of(message, detail, "MethodArgumentNotValidException", ErrorCode.GLOBAL, HttpStatus.BAD_REQUEST));
 		}
-		return erros;
+		return errors;
 	}
 
 	@ExceptionHandler({ EmptyResultDataAccessException.class })
 	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest req) {
 		
-		String mensagem = messageSource.getMessage("recurso.nao-encontrado", null, LocaleContextHolder.getLocale());
-		String mensagemDesenvolvedor = ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(mensagem, mensagemDesenvolvedor));
+		String message = messageSource.getMessage("recurso.nao-encontrado", null, LocaleContextHolder.getLocale());
+		String detail = ex.toString();
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.GLOBAL, HttpStatus.NOT_FOUND));
+
 		
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.NOT_FOUND, req);
 		
@@ -76,36 +77,20 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler({ DataIntegrityViolationException.class })
 	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
-		String mensagem = messageSource.getMessage("recurso.operacao-nao-permitida", null, LocaleContextHolder.getLocale());
-		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
-		List<Erro> erros = Arrays.asList(new Erro(mensagem, mensagemDesenvolvedor));
-		
-		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-	}
-	@ExceptionHandler({ MissingRefreshTokenCookieException.class })
-	public ResponseEntity<Object> handleMissingRefreshTokenCookieException(MissingRefreshTokenCookieException ex, WebRequest request) {
-		String mensagem = messageSource.getMessage("recurso.missing-refresh-token-cookie", null, LocaleContextHolder.getLocale());
-		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
-		List<Erro> erros = Arrays.asList(new Erro(mensagem, mensagemDesenvolvedor));		
+		String message = messageSource.getMessage("recurso.operacao-nao-permitida", null, LocaleContextHolder.getLocale());
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.GLOBAL, HttpStatus.BAD_REQUEST));
+	
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 	
-	public static class Erro {
-		private String mensagemUsuario;
-		private String mensagemDesenvolvedor;
-
-		public Erro(String mensagemUsuario, String mensagemDesenvolvedor) {
-			this.mensagemUsuario = mensagemUsuario;
-			this.mensagemDesenvolvedor = mensagemDesenvolvedor;
-		}
-
-		public String getMensagemUsuario() {
-			return mensagemUsuario;
-		}
-
-		public String getMensagemDesenvolvedor() {
-			return mensagemDesenvolvedor;
-		}
-
+	@ExceptionHandler({ MissingRefreshTokenCookieException.class })
+	public ResponseEntity<Object> handleMissingRefreshTokenCookieException(MissingRefreshTokenCookieException ex, WebRequest request) {
+		String message = messageSource.getMessage("recurso.missing-refresh-token-cookie", null, LocaleContextHolder.getLocale());
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
+	
 }

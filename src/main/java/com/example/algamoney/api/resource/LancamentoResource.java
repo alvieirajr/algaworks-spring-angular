@@ -24,8 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.algamoney.api.common.ErrorCode;
+import com.example.algamoney.api.common.ErrorResponse;
 import com.example.algamoney.api.event.RecursoCriadoEvent;
-import com.example.algamoney.api.exceptionhandler.AlgamoneyExceptionHandler.Erro;
 import com.example.algamoney.api.model.Lancamento;
 import com.example.algamoney.api.repository.LancamentoRepository;
 import com.example.algamoney.api.repository.filter.LancamentoFilter;
@@ -70,9 +71,10 @@ public class LancamentoResource {
 	
 	@ExceptionHandler({ PessoaInexistenteOuInativaException.class })
 	public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex ) {
-		String mensagem = messageSource.getMessage("pessoa.inexistente-ou-inativa", null, LocaleContextHolder.getLocale());
-		String mensagemDesenvolvedor = ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(mensagem, mensagemDesenvolvedor));
+		String message = messageSource.getMessage("pessoa.inexistente-ou-inativa", null, LocaleContextHolder.getLocale());
+		String detail = ex.toString();
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.GLOBAL, HttpStatus.BAD_REQUEST));
+
 		return ResponseEntity.badRequest().body(erros);
 	}
 	

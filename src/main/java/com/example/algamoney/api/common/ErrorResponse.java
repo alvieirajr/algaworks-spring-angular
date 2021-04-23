@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 /**
  * Error model for interacting with client.
  * 
- * @author vladimir.stankovic
+ * @author antonio.vieira
  *
- * Aug 3, 2016
+ * Apr 23, 2021
  */
 public class ErrorResponse {
     // HTTP Response Status Code
@@ -18,21 +18,25 @@ public class ErrorResponse {
 
     // General Error message
     private final String message;
+    private final String detail;
+    private final String type;
 
     // Error code
     private final ErrorCode errorCode;
 
     private final Date timestamp;
 
-    protected ErrorResponse(final String message, final ErrorCode errorCode, HttpStatus status) {
+    protected ErrorResponse(final String message, final String detail, final String type, final ErrorCode errorCode, HttpStatus status) {
         this.message = message;
+        this.detail = detail;
+		this.type = type;
         this.errorCode = errorCode;
         this.status = status;
         this.timestamp = new java.util.Date();
     }
 
-    public static ErrorResponse of(final String message, final ErrorCode errorCode, HttpStatus status) {
-        return new ErrorResponse(message, errorCode, status);
+    public static ErrorResponse of(final String message, final String detail, final String type, final ErrorCode errorCode, HttpStatus status) {
+        return new ErrorResponse(message, detail, type, errorCode, status);
     }
 
     public Integer getStatus() {
@@ -50,4 +54,13 @@ public class ErrorResponse {
     public Date getTimestamp() {
         return timestamp;
     }
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public String getType() {
+		return type;
+	}
+    
 }
