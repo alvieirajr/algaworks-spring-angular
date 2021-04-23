@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.example.algamoney.api.security.exceptions.MissingRefreshTokenCookieException;
+
 @ControllerAdvice
 public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -80,7 +82,13 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
-	
+	@ExceptionHandler({ MissingRefreshTokenCookieException.class })
+	public ResponseEntity<Object> handleMissingRefreshTokenCookieException(MissingRefreshTokenCookieException ex, WebRequest request) {
+		String mensagem = messageSource.getMessage("recurso.missing-refresh-token-cookie", null, LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
+		List<Erro> erros = Arrays.asList(new Erro(mensagem, mensagemDesenvolvedor));		
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
 	
 	public static class Erro {
 		private String mensagemUsuario;

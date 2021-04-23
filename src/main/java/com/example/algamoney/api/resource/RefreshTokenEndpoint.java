@@ -32,6 +32,7 @@ import com.example.algamoney.api.security.auth.jwt.verifier.TokenVerifier;
 import com.example.algamoney.api.security.config.JwtSettings;
 import com.example.algamoney.api.security.config.WebSecurityConfig;
 import com.example.algamoney.api.security.exceptions.InvalidJwtToken;
+import com.example.algamoney.api.security.exceptions.MissingRefreshTokenCookieException;
 import com.example.algamoney.api.security.model.UserContext;
 import com.example.algamoney.api.security.model.token.JwtToken;
 import com.example.algamoney.api.security.model.token.JwtTokenFactory;
@@ -64,8 +65,7 @@ public class RefreshTokenEndpoint {
 		HttpServletRequest req = (HttpServletRequest) request;
 		String refreshTokenOnCookie = null;
 		if (req.getCookies() == null) {
-			req.setAttribute("breakFiltersChain", true);
-			throw new AuthenticationServiceException("Refresh token cookie not found!");
+			throw new MissingRefreshTokenCookieException();
 		} else {
 			for (Cookie cookie : req.getCookies()) {
 				if (cookie.getName().equals("refreshToken")) {
