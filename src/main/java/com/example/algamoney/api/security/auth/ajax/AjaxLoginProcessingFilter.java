@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.example.algamoney.api.common.WebUtil;
+import com.example.algamoney.api.config.property.AlgaMoneyApiProperty;
 import com.example.algamoney.api.security.config.WebSecurityConfig;
 import com.example.algamoney.api.security.exceptions.AuthMethodNotSupportedException;
 import com.example.algamoney.api.security.model.UserContext;
@@ -44,6 +46,9 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
 
     private final ObjectMapper objectMapper;
     private final JwtTokenFactory tokenFactory;
+    
+	@Autowired
+	private AlgaMoneyApiProperty algaMoneyApiProperty = new AlgaMoneyApiProperty();
     
     public AjaxLoginProcessingFilter(String defaultProcessUrl, AuthenticationSuccessHandler successHandler, 
             AuthenticationFailureHandler failureHandler, ObjectMapper mapper, JwtTokenFactory tokenFactory) {
@@ -83,7 +88,7 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
         JwtToken refreshToken = tokenFactory.createRefreshToken(userContext);
 	  	
         Cookie cookie  = new Cookie("refreshToken", refreshToken.getToken());
-		cookie.setHttpOnly(true);
+		cookie.setHttpOnly(algaMoneyApiProperty.getSecurity().isEnableHttps());
 		cookie.setSecure(false);
 		cookie.setPath(request.getContextPath() + WebSecurityConfig.REFRESH_TOKEN_URL);
 		cookie.setMaxAge(259200);

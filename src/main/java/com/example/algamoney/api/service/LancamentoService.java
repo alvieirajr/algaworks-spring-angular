@@ -1,4 +1,4 @@
-package com.example.algamoney.api.services;
+package com.example.algamoney.api.service;
 
 import javax.validation.Valid;
 
@@ -9,7 +9,7 @@ import com.example.algamoney.api.model.Lancamento;
 import com.example.algamoney.api.model.Pessoa;
 import com.example.algamoney.api.repository.LancamentoRepository;
 import com.example.algamoney.api.repository.PessoaRepository;
-import com.example.algamoney.api.services.exception.PessoaInexistenteOuInativaException;
+import com.example.algamoney.api.service.exception.PessoaInexistenteOuInativaException;
 
 @Service
 public class LancamentoService {

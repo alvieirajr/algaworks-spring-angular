@@ -30,8 +30,8 @@ import com.example.algamoney.api.event.RecursoCriadoEvent;
 import com.example.algamoney.api.model.Lancamento;
 import com.example.algamoney.api.repository.LancamentoRepository;
 import com.example.algamoney.api.repository.filter.LancamentoFilter;
-import com.example.algamoney.api.services.LancamentoService;
-import com.example.algamoney.api.services.exception.PessoaInexistenteOuInativaException;
+import com.example.algamoney.api.service.LancamentoService;
+import com.example.algamoney.api.service.exception.PessoaInexistenteOuInativaException;
 
 @RestController
 @RequestMapping("/api/lancamentos")

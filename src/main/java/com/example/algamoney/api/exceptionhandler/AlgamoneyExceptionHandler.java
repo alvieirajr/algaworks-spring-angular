@@ -27,7 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.example.algamoney.api.common.ErrorCode;
 import com.example.algamoney.api.common.ErrorResponse;
-import com.example.algamoney.api.security.exceptions.InvalidJwtToken;
+import com.example.algamoney.api.security.exceptions.InvalidJWTTokenException;
 import com.example.algamoney.api.security.exceptions.JWTTokenWithoutUsernameException;
 import com.example.algamoney.api.security.exceptions.MissingRefreshTokenCookieException;
 import com.example.algamoney.api.security.exceptions.UserWithoutPrivilegesException;
@@ -99,8 +99,8 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 
-	@ExceptionHandler({ InvalidJwtToken.class })
-	public ResponseEntity<Object> handleInvalidJwtToken(InvalidJwtToken ex, WebRequest request) {
+	@ExceptionHandler({ InvalidJWTTokenException.class })
+	public ResponseEntity<Object> handleInvalidJWTToken(InvalidJWTTokenException ex, WebRequest request) {
 		String message = messageSource.getMessage("recurso.InvalidJwtToken", null, LocaleContextHolder.getLocale());
 		String detail = ExceptionUtils.getRootCauseMessage(ex);
 		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));

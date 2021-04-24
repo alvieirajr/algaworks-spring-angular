@@ -26,18 +26,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.algamoney.api.model.Usuario;
-import com.example.algamoney.api.security.UsuarioService;
 import com.example.algamoney.api.security.auth.jwt.extractor.TokenExtractor;
 import com.example.algamoney.api.security.auth.jwt.verifier.TokenVerifier;
 import com.example.algamoney.api.security.config.JwtSettings;
 import com.example.algamoney.api.security.config.WebSecurityConfig;
-import com.example.algamoney.api.security.exceptions.InvalidJwtToken;
+import com.example.algamoney.api.security.exceptions.InvalidJWTTokenException;
 import com.example.algamoney.api.security.exceptions.MissingRefreshTokenCookieException;
 import com.example.algamoney.api.security.model.UserContext;
 import com.example.algamoney.api.security.model.token.JwtToken;
 import com.example.algamoney.api.security.model.token.JwtTokenFactory;
 import com.example.algamoney.api.security.model.token.RawAccessJwtToken;
 import com.example.algamoney.api.security.model.token.RefreshToken;
+import com.example.algamoney.api.service.UsuarioService;
 
 /**
  * RefreshTokenEndpoint
@@ -76,11 +76,11 @@ public class RefreshTokenEndpoint {
 
 		RawAccessJwtToken rawToken = new RawAccessJwtToken(refreshTokenOnCookie);
 		RefreshToken refreshToken = RefreshToken.create(rawToken, jwtSettings.getTokenSigningKey())
-				.orElseThrow(() -> new InvalidJwtToken());
+				.orElseThrow(() -> new InvalidJWTTokenException());
 
 		String jti = refreshToken.getJti();
 		if (!tokenVerifier.verify(jti)) {
-			throw new InvalidJwtToken();
+			throw new InvalidJWTTokenException();
 		}
 
 		String subject = refreshToken.getSubject();

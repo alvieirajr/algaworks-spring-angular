@@ -1,4 +1,4 @@
-package com.example.algamoney.api.security;
+package com.example.algamoney.api.service;
 
 import java.util.Optional;
 

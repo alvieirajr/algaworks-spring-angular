@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
 import com.example.algamoney.api.model.Usuario;
 import com.example.algamoney.api.security.exceptions.UserWithoutPrivilegesException;
 import com.example.algamoney.api.security.model.UserContext;
-import com.example.algamoney.api.services.DatabaseUsuarioService;
+import com.example.algamoney.api.service.DatabaseUsuarioService;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package com.example.algamoney.api.services;
+package com.example.algamoney.api.service;
 
 import java.util.Optional;
 
@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.algamoney.api.model.Usuario;
 import com.example.algamoney.api.repository.UsuarioRepository;
-import com.example.algamoney.api.security.UsuarioService;
 
 /**
  * Mock implementation.

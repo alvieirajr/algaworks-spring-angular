@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.example.algamoney.api.common.ErrorCode;
 import com.example.algamoney.api.common.ErrorResponse;
 import com.example.algamoney.api.security.exceptions.AuthMethodNotSupportedException;
-import com.example.algamoney.api.security.exceptions.JwtExpiredTokenException;
+import com.example.algamoney.api.security.exceptions.JWTExpiredTokenException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -50,7 +50,7 @@ public class AjaxAwareAuthenticationFailureHandler implements AuthenticationFail
 		if (e instanceof BadCredentialsException) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			mapper.writeValue(response.getWriter(), ErrorResponse.of(e.getMessage(), detail, e.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
-		} else if (e instanceof JwtExpiredTokenException) {
+		} else if (e instanceof JWTExpiredTokenException) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			mapper.writeValue(response.getWriter(), ErrorResponse.of("Token has expired", detail, e.getClass().getName(), ErrorCode.JWT_TOKEN_EXPIRED, HttpStatus.UNAUTHORIZED));
 		} else if (e instanceof AuthMethodNotSupportedException) {
