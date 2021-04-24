@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 
-import com.example.algamoney.api.security.exceptions.JWTExpiredTokenException;
+import com.example.algamoney.api.security.exceptions.JwtExpiredTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -39,7 +39,7 @@ public class RawAccessJwtToken implements JwtToken {
             throw new BadCredentialsException("Invalid JWT token: ", ex);
         } catch (ExpiredJwtException expiredEx) {
             logger.info("JWT Token is expired", expiredEx);
-            throw new JWTExpiredTokenException(this, "JWT Token expired", expiredEx);
+            throw new JwtExpiredTokenException(this, "JWT Token expired", expiredEx);
         }
     }
 
