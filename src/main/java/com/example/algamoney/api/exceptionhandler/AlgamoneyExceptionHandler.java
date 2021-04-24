@@ -14,6 +14,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,7 +27,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.example.algamoney.api.common.ErrorCode;
 import com.example.algamoney.api.common.ErrorResponse;
+import com.example.algamoney.api.security.exceptions.InvalidJwtToken;
+import com.example.algamoney.api.security.exceptions.JWTTokenWithoutUsernameException;
 import com.example.algamoney.api.security.exceptions.MissingRefreshTokenCookieException;
+import com.example.algamoney.api.security.exceptions.UserWithoutPrivilegesException;
 
 @ControllerAdvice
 public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
@@ -86,11 +92,66 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler({ MissingRefreshTokenCookieException.class })
 	public ResponseEntity<Object> handleMissingRefreshTokenCookieException(MissingRefreshTokenCookieException ex, WebRequest request) {
-		String message = messageSource.getMessage("recurso.missing-refresh-token-cookie", null, LocaleContextHolder.getLocale());
+		String message = messageSource.getMessage("recurso.MissingRefreshTokenCookieException", null, LocaleContextHolder.getLocale());
 		String detail = ExceptionUtils.getRootCauseMessage(ex);
 		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
 			
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
+
+	@ExceptionHandler({ InvalidJwtToken.class })
+	public ResponseEntity<Object> handleInvalidJwtToken(InvalidJwtToken ex, WebRequest request) {
+		String message = messageSource.getMessage("recurso.InvalidJwtToken", null, LocaleContextHolder.getLocale());
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@ExceptionHandler({ BadCredentialsException.class })
+	public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
+		String message = messageSource.getMessage("recurso.BadCredentialsException", null, LocaleContextHolder.getLocale());
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@ExceptionHandler({ UsernameNotFoundException.class })
+	public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex, WebRequest request) {
+		String message = messageSource.getMessage("recurso.UsernameNotFoundException", null, LocaleContextHolder.getLocale());
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}	
+	
+	@ExceptionHandler({ InsufficientAuthenticationException.class })
+	public ResponseEntity<Object> handleInsufficientAuthenticationException(InsufficientAuthenticationException ex, WebRequest request) {
+		String message = messageSource.getMessage("recurso.InsufficientAuthenticationException", null, LocaleContextHolder.getLocale());
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}		
+	
+	@ExceptionHandler({ JWTTokenWithoutUsernameException.class })
+	public ResponseEntity<Object> handleJWTTokenWithoutUsernameException(JWTTokenWithoutUsernameException ex, WebRequest request) {
+		String message = ex.getMessage();
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.AUTHENTICATION, HttpStatus.BAD_REQUEST));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}		
+	
+	
+	@ExceptionHandler({ UserWithoutPrivilegesException.class })
+	public ResponseEntity<Object> handleUserWithoutPrivilegesException(UserWithoutPrivilegesException ex, WebRequest request) {
+		String message = ex.getMessage();
+		String detail = ExceptionUtils.getRootCauseMessage(ex);
+		List<ErrorResponse> erros = Arrays.asList(ErrorResponse.of(message, detail, ex.getClass().getName(), ErrorCode.GLOBAL, HttpStatus.INTERNAL_SERVER_ERROR));
+			
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+	}		
 	
 }

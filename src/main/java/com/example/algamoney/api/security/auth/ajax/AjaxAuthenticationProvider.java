@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.example.algamoney.api.model.Usuario;
+import com.example.algamoney.api.security.exceptions.UserWithoutPrivilegesException;
 import com.example.algamoney.api.security.model.UserContext;
 import com.example.algamoney.api.services.DatabaseUsuarioService;
 
@@ -51,7 +52,11 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Authentication Failed. Username or Password not valid.");
         }
 
-        if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
+        if (user.getRoles() != null) {
+        	if (user.getRoles().isEmpty()) {
+        		throw new UserWithoutPrivilegesException("User has no roles assigned");
+        	}
+        }
         
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getRole().authority()))

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.algamoney.api.security.config.JwtSettings;
+import com.example.algamoney.api.security.exceptions.JWTTokenWithoutUsernameException;
+import com.example.algamoney.api.security.exceptions.UserWithoutPrivilegesException;
 import com.example.algamoney.api.security.model.Scopes;
 import com.example.algamoney.api.security.model.UserContext;
 
@@ -45,10 +47,10 @@ public class JwtTokenFactory {
      */
     public AccessJwtToken createAccessJwtToken(UserContext userContext) {
         if (StringUtils.isBlank(userContext.getUsername())) 
-            throw new IllegalArgumentException("Cannot create JWT Token without username");
+            throw new JWTTokenWithoutUsernameException("Cannot create JWT Token without username");
 
         if (userContext.getAuthorities() == null || userContext.getAuthorities().isEmpty()) 
-            throw new IllegalArgumentException("User doesn't have any privileges");
+            throw new UserWithoutPrivilegesException("");
 
         Claims claims = Jwts.claims().setSubject(userContext.getUsername());
         claims.put("scopes", userContext.getAuthorities().stream().map(s -> s.toString()).collect(Collectors.toList()));
@@ -70,7 +72,7 @@ public class JwtTokenFactory {
 
     public JwtToken createRefreshToken(UserContext userContext) {
         if (StringUtils.isBlank(userContext.getUsername())) {
-            throw new IllegalArgumentException("Cannot create JWT Token without username");
+            throw new JWTTokenWithoutUsernameException("Cannot create JWT Token without username");
         }
 
         LocalDateTime currentTime = LocalDateTime.now();
