@@ -32,7 +32,7 @@ public class RefreshToken implements JwtToken {
      * @param signingKey
      * 
      * @throws BadCredentialsException
-     * @throws JwtExpiredTokenException
+     * @throws JWTExpiredTokenException
      * 
      * @return
      */

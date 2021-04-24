@@ -28,7 +28,7 @@ public class RawAccessJwtToken implements JwtToken {
      * Parses and validates JWT Token signature.
      * 
      * @throws BadCredentialsException
-     * @throws JwtExpiredTokenException
+     * @throws JWTExpiredTokenException
      * 
      */
     public Jws<Claims> parseClaims(String signingKey) {
